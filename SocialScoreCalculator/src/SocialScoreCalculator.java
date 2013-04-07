@@ -6,6 +6,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.DB;
@@ -27,7 +28,7 @@ public class SocialScoreCalculator extends AbstractHandler
 		response.getWriter().println("<h1>LENDR.CO</h1>");
 		String userId = request.getQueryString().split("=")[1];
 		
-		displayData(response, Integer.parseInt(userId));
+		displayData(response, userId);
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -38,8 +39,9 @@ public class SocialScoreCalculator extends AbstractHandler
         server.join();
     }
 	
-	public static void displayData(HttpServletResponse response, int userId)
+	public static void displayData(HttpServletResponse response, String userId)
     {
+		int intUserId = Integer.parseInt(userId);
     	try {
 	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com");
 	    	DB db = mongoClient.getDB( "lendrDb" );
@@ -51,8 +53,10 @@ public class SocialScoreCalculator extends AbstractHandler
 	    	}
 	    	
 	    	DBCollection coll = db.getCollection("friends");
+	    	BasicDBObject query = new BasicDBObject("id", userId);
+	    	
 	    	response.getWriter().println("<h2> # friends for user:" + userId + "</h2>");
-	    	response.getWriter().println(coll.getCount());
+	    	response.getWriter().println(coll.getCount(query));
 			
     	}
     	catch(Exception e) {
