@@ -35,17 +35,17 @@ public class SocialScoreCalculator extends AbstractHandler
 	public static void testDb(HttpServletResponse response)
     {
     	try {
-	    	MongoClient mongoClient = new MongoClient();
+	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com", 28017);
 	    	DB db = mongoClient.getDB( "lendrDb" );
 	    	Set<String> colls = db.getCollectionNames();
 	
-	    	response.getWriter().println("MongoDb collections:");
+	    	response.getWriter().println("MongoDb collections:\n");
 	    			
 	    	for (String s : colls) {
-	    		response.getWriter().println(s);
+	    		response.getWriter().println(s + "\n");
 	    	}
 	    	
-	    	response.getWriter().println("");
+	    	response.getWriter().println("\n");
     	}
     	catch(Exception e) {
     		try {
