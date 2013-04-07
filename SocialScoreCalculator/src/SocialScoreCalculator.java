@@ -23,6 +23,14 @@ public class SocialScoreCalculator extends AbstractHandler
 		response.getWriter().println("<h1>Hello World</h1>");
 		testDb(response);
 	}
+	
+	public static void main(String[] args) throws Exception
+    {
+        Server server = new Server(8080);
+        server.setHandler(new SocialScoreCalculator());
+        server.start();
+        server.join();
+    }
 
 	public static void testDb(HttpServletResponse response)
     {
