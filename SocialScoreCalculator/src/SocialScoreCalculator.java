@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+
+import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.DB;
 import java.util.Set;
@@ -22,12 +24,10 @@ public class SocialScoreCalculator extends AbstractHandler
 		response.setContentType("text/html;charset=utf-8");
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
-		response.getWriter().println("<h1>Hello World</h1>");
+		response.getWriter().println("<h1>LENDR.CO</h1>");
 		String userId = request.getQueryString().split("=")[1];
 		
-		response.getWriter().println("<h2>" + userId + "</h2>");
-		
-		testDb(response);
+		displayData(response, Integer.parseInt(userId));
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -38,20 +38,22 @@ public class SocialScoreCalculator extends AbstractHandler
         server.join();
     }
 	
-	public static void testDb(HttpServletResponse response)
+	public static void displayData(HttpServletResponse response, int userId)
     {
     	try {
-	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com", 27017);
+	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com");
 	    	DB db = mongoClient.getDB( "lendrDb" );
-	    	Set<String> colls = db.getCollectionNames();
-	
-	    	response.getWriter().println("MongoDb collections:\n");
-	    			
+	    	
+	    	response.getWriter().println("<h2> Collection </h2>");
+	    	Set<String> colls = db.getCollectionNames();	
 	    	for (String s : colls) {
 	    		response.getWriter().println(s + "\n");
 	    	}
 	    	
-	    	response.getWriter().println("\n");
+	    	DBCollection coll = db.getCollection("friends");
+	    	response.getWriter().println("<h2> # friends for user:" + userId + "</h2>");
+	    	response.getWriter().println(coll.getCount());
+			
     	}
     	catch(Exception e) {
     		try {
