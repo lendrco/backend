@@ -31,7 +31,7 @@ public class SocialScoreCalculator extends AbstractHandler
         server.start();
         server.join();
     }
-
+	
 	public static void testDb(HttpServletResponse response)
     {
     	try {
