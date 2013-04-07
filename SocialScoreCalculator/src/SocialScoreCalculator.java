@@ -29,9 +29,17 @@ public class SocialScoreCalculator extends AbstractHandler
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		response.getWriter().println("<h1>LENDR.CO</h1>");
-		String userId = request.getQueryString().split("=")[1];
-		response.getWriter().println("<h3>User id: " + userId + "</h1>");
-		displayData(response, userId);
+		
+		String queryString = request.getQueryString();
+		if(queryString.length() > 0 && queryString.contains("=")) {
+			String userId = request.getQueryString().split("=")[1];	
+			
+			int score = displayData(response, userId);
+			response.getWriter().println("<h2>Social score: " + score + "</h2>");
+		}
+		else {
+			response.getWriter().println("<h2>Error: No query string provided.</h2>");
+		}
 	}
 	
 	public static void main(String[] args) throws Exception
@@ -42,28 +50,25 @@ public class SocialScoreCalculator extends AbstractHandler
         server.join();
     }
 	
-	public static void displayData(HttpServletResponse response, String userId)
+	public static int displayData(HttpServletResponse response, String userId)
     {
-		int intUserId = Integer.parseInt(userId);
+		int score = 0;
     	try {
 	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com");
 	    	DB db = mongoClient.getDB( "lendrDb" );
 	    	
-	    	response.getWriter().println("<h2> Collection </h2>");
-	    	Set<String> colls = db.getCollectionNames();	
-	    	for (String s : colls) {
-	    		response.getWriter().println(s + "\n");
-	    	}
-	    	
 	    	DBCollection friends = db.getCollection("friends");
 	    	DBCollection profiles = db.getCollection("profiles");
+	    	
 	    	BasicDBObject query = new BasicDBObject("id", userId);
 	    	
 	    	DBObject userProfile = (DBObject) JSON.parse((String)profiles.findOne(query).get("profile"));
 	    	String userName = (String) userProfile.get("name");
-	    	response.getWriter().println("<h2> # friends for user: " + userName + "</h2>");
-	    	response.getWriter().println(friends.getCount(query));
-			
+	    	long friendCount = friends.getCount(query);
+	    	response.getWriter().println("<h3> Number friends for " + userName + " (" + userId + "): " + friendCount + "</h3>");
+			if(friendCount > 1500) {
+				score = 1;
+			}
     	}
     	catch(Exception e) {
     		try {
@@ -72,5 +77,6 @@ public class SocialScoreCalculator extends AbstractHandler
 				e1.printStackTrace();
 			}
     	}
+    	return score;
     }
 }
