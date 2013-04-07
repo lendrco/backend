@@ -11,6 +11,8 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.DB;
+import com.mongodb.util.JSON;
+
 import java.util.Set;
 import org.json.simple.JSONObject;
 import org.eclipse.jetty.util.*;
@@ -57,7 +59,7 @@ public class SocialScoreCalculator extends AbstractHandler
 	    	DBCollection profiles = db.getCollection("profiles");
 	    	BasicDBObject query = new BasicDBObject("id", userId);
 	    	
-	    	DBObject userProfile = (DBObject) profiles.findOne(query).get("profile");
+	    	DBObject userProfile = (DBObject) JSON.parse((String)profiles.findOne(query).get("profile"));
 	    	String userName = (String) userProfile.get("name");
 	    	response.getWriter().println("<h2> # friends for user: " + userName + "</h2>");
 	    	response.getWriter().println(friends.getCount(query));
