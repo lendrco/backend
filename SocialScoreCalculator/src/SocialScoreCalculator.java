@@ -8,6 +8,8 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import com.mongodb.MongoClient;
 import com.mongodb.DB;
 import java.util.Set;
+import org.json.simple.JSONObject;
+import org.eclipse.jetty.util.*;
 
 public class SocialScoreCalculator extends AbstractHandler 
 {
@@ -21,6 +23,10 @@ public class SocialScoreCalculator extends AbstractHandler
 		response.setStatus(HttpServletResponse.SC_OK);
 		baseRequest.setHandled(true);
 		response.getWriter().println("<h1>Hello World</h1>");
+		String userId = request.getQueryString().split("=")[1];
+		
+		response.getWriter().println("<h2>" + userId + "</h2>");
+		
 		testDb(response);
 	}
 	
@@ -35,7 +41,7 @@ public class SocialScoreCalculator extends AbstractHandler
 	public static void testDb(HttpServletResponse response)
     {
     	try {
-	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com", 28017);
+	    	MongoClient mongoClient = new MongoClient("ec2-54-245-170-121.us-west-2.compute.amazonaws.com", 27017);
 	    	DB db = mongoClient.getDB( "lendrDb" );
 	    	Set<String> colls = db.getCollectionNames();
 	
